@@ -1,5 +1,6 @@
-import react, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Home() {
   const [underline, setUnderline] = useState([
@@ -8,9 +9,115 @@ export default function Home() {
     { part: "evolution", style: undefined },
     { part: "moves", style: undefined },
   ]);
+  const [pages, setPages] = useState(1);
   const [pokemons, setPokemons] = useState([]);
-
+  const [details, setDetails] = useState([]);
+  const [readDetails, setReadDetails] = useState({});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(pokemons);
+    getDetails();
+  }, [pokemons]);
+
+  useEffect(() => {
+    console.log(details);
+    setReadDetails(details[0]);
+  }, [details]);
+
+  useEffect(() => {
+    const offset = (pages - 1) * 8;
+    async function getPokemon() {
+      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=8`);
+      setPokemons(response.data.results);
+    }
+    getPokemon();
+  }, []);
+
+  const getDetails = () => {
+    async function fetchAllDetail() {
+      const response1 = await axios.get(pokemons[0].url);
+      const response2 = await axios.get(pokemons[1].url);
+      const response3 = await axios.get(pokemons[2].url);
+      const response4 = await axios.get(pokemons[3].url);
+      const response5 = await axios.get(pokemons[4].url);
+      const response6 = await axios.get(pokemons[5].url);
+      const response7 = await axios.get(pokemons[6].url);
+      const response8 = await axios.get(pokemons[7].url);
+      setDetails([response1.data, response2.data, response3.data, response4.data, response5.data, response6.data, response7.data, response8.data]);
+    }
+    fetchAllDetail();
+  };
+
+  const makeCard = () => {
+    if (details.length == 0) {
+      return <div>Loading...</div>;
+    } else if (details.length > 0) {
+      return details.map((detail, index) => {
+        if (detail.types[0].type.name === "grass") {
+          return (
+            <button>
+              <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
+                <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
+                  {detail.name}
+                </div>
+                <div id="info" className="flex flex-row pb-0 ml-4">
+                  <div id="type" className="mt-3">
+                    {detail.types.map((type, index) => {
+                      return <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">{type.type.name}</p>;
+                    })}
+                  </div>
+                  <div id="image">
+                    <img style={{ height: "150px", width: "220px" }} src={detail.sprites.other.dream_world.front_default} alt="Bulbasaur" />
+                  </div>
+                </div>
+              </div>
+            </button>
+          );
+        } else if (detail.types[0].type.name === "fire") {
+          return (
+            <button>
+              <div id="card" className="rounded-box flex flex-col bg-red-500 border-2 h-52 w-72">
+                <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
+                  {detail.name}
+                </div>
+                <div id="info" className="flex flex-row pb-0 ml-4">
+                  <div id="type" className="mt-3">
+                    {detail.types.map((type, index) => {
+                      return <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">{type.type.name}</p>;
+                    })}
+                  </div>
+                  <div id="image">
+                    <img style={{ height: "150px", width: "220px" }} src={detail.sprites.other.dream_world.front_default} alt="Bulbasaur" />
+                  </div>
+                </div>
+              </div>
+            </button>
+          );
+        } else {
+          return (
+            <button>
+              <div id="card" className="rounded-box flex flex-col bg-blue-400 border-2 h-52 w-72">
+                <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
+                  {detail.name}
+                </div>
+                <div id="info" className="flex flex-row pb-0 ml-4">
+                  <div id="type" className="mt-3">
+                    {detail.types.map((type, index) => {
+                      return <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">{type.type.name}</p>;
+                    })}
+                  </div>
+                  <div id="image">
+                    <img style={{ height: "150px", width: "220px" }} src={detail.sprites.other.dream_world.front_default} alt="Bulbasaur" />
+                  </div>
+                </div>
+              </div>
+            </button>
+          );
+        }
+      });
+    }
+  };
 
   const detailHandler = (e) => {
     if (e.target.name === "about") {
@@ -38,152 +145,7 @@ export default function Home() {
         </div>
         <div id="sidebar" style={{ height: "790px", width: "600px", backgroundColor: "white", overflow: "auto" }}>
           <div id="sidebar-body" className="grid grid-cols-2 gap-1">
-            <button>
-              <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-                <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                  Bulbasaur
-                </div>
-                <div id="info" className="flex flex-row pb-0 ml-4">
-                  <div id="type" className="mt-3">
-                    <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                    <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                  </div>
-                  <div id="image">
-                    <img
-                      style={{ height: "150px", width: "220px" }}
-                      src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                      alt="Bulbasaur"
-                    />
-                  </div>
-                </div>
-              </div>
-            </button>
-            <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-              <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                Bulbasaur
-              </div>
-              <div id="info" className="flex flex-row pb-0 ml-4">
-                <div id="type" className="mt-3">
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                </div>
-                <div id="image">
-                  <img
-                    style={{ height: "150px", width: "220px" }}
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                    alt="Bulbasaur"
-                  />
-                </div>
-              </div>
-            </div>
-            <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-              <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                Bulbasaur
-              </div>
-              <div id="info" className="flex flex-row pb-0 ml-4">
-                <div id="type" className="mt-3">
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                </div>
-                <div id="image">
-                  <img
-                    style={{ height: "150px", width: "220px" }}
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                    alt="Bulbasaur"
-                  />
-                </div>
-              </div>
-            </div>
-            <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-              <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                Bulbasaur
-              </div>
-              <div id="info" className="flex flex-row pb-0 ml-4">
-                <div id="type" className="mt-3">
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                </div>
-                <div id="image">
-                  <img
-                    style={{ height: "150px", width: "220px" }}
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                    alt="Bulbasaur"
-                  />
-                </div>
-              </div>
-            </div>
-            <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-              <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                Bulbasaur
-              </div>
-              <div id="info" className="flex flex-row pb-0 ml-4">
-                <div id="type" className="mt-3">
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                </div>
-                <div id="image">
-                  <img
-                    style={{ height: "150px", width: "220px" }}
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                    alt="Bulbasaur"
-                  />
-                </div>
-              </div>
-            </div>
-            <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-              <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                Bulbasaur
-              </div>
-              <div id="info" className="flex flex-row pb-0 ml-4">
-                <div id="type" className="mt-3">
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                </div>
-                <div id="image">
-                  <img
-                    style={{ height: "150px", width: "220px" }}
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                    alt="Bulbasaur"
-                  />
-                </div>
-              </div>
-            </div>
-            <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-              <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                Bulbasaur
-              </div>
-              <div id="info" className="flex flex-row pb-0 ml-4">
-                <div id="type" className="mt-3">
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                </div>
-                <div id="image">
-                  <img
-                    style={{ height: "150px", width: "220px" }}
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                    alt="Bulbasaur"
-                  />
-                </div>
-              </div>
-            </div>
-            <div id="card" className="rounded-box flex flex-col bg-green-400 border-2 h-52 w-72">
-              <div id="name" className="pt-5 ml-4 text-left text-white text-xl">
-                Bulbasaur
-              </div>
-              <div id="info" className="flex flex-row pb-0 ml-4">
-                <div id="type" className="mt-3">
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white">Grass</p>
-                  <p className="bg-white bg-opacity-40 rounded-box px-2 text-white mt-2">Poison</p>
-                </div>
-                <div id="image">
-                  <img
-                    style={{ height: "150px", width: "220px" }}
-                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
-                    alt="Bulbasaur"
-                  />
-                </div>
-              </div>
-            </div>
+            {makeCard()}
           </div>
         </div>
       </div>
@@ -226,7 +188,7 @@ export default function Home() {
               </ul>
             </div>
             <div id="content" className="mx-auto">
-              <Outlet />
+              <Outlet context={[readDetails]} />
             </div>
           </div>
         </div>
