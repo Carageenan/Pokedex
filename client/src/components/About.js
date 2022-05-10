@@ -5,23 +5,20 @@ export default function About() {
   const [species, setSpecies] = useState([]);
   const [readDetails] = useOutletContext();
 
-  useEffect(() => {
-    console.log(species);
-  }, [species]);
+  useEffect(() => {}, [species]);
 
   useEffect(() => {
     async function fetchSpecies() {
-      const response = await axios.get(readDetails.species.url);
+      const response = await axios.get(readDetails?.species?.url);
       setSpecies(response.data);
     }
     fetchSpecies();
   }, [readDetails]);
-  console.log(readDetails);
   return (
     <table className="mt-10">
       <tr>
-        <th className="pl-10 text-2xl text-left">Species</th>
-        <td className="pl-16 text-xl text-left">Seed</td>
+        <th className="pl-10 text-2xl text-left">Shape</th>
+        <td className="pl-16 text-xl text-left">{species?.shape?.name}</td>
       </tr>
       <tr>
         <th className="pl-10 text-2xl text-left">Height</th>
